@@ -1,0 +1,15 @@
+numpy
+pandas
+matplotlib
+seaborn
+opencv-python
+ultralytics
+labelImg
+streamlit
+onnx
+onnxruntime
+fastapi
+uvicorn
+torch
+torchvision
+psycopg2-binary
