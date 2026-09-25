@@ -12,3 +12,4 @@ dataset/
 .DS_Store
 .vscode/
 .idea/
+detections.json
