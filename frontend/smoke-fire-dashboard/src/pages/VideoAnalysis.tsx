@@ -4,7 +4,7 @@ import PageContainer from "../components/layout/PageContainer";
 import Card from "../components/common/Card";
 import Button from "../components/common/Button";
 import VideoUploader from "../components/video/VideoUploader";
-import VideoMetadataDisplay from "../components/video/VideoMetadata";
+import VideoMetadataDisplay from "../components/video/VideoMetaData";
 import UploadProgress from "../components/video/UploadProgress";
 import VideoPlayer from "../components/video/VideoPlayer";
 import DetectionTimeline from "../components/video/DetectionTimeline";

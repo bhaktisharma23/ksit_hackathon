@@ -1,7 +1,7 @@
 import { apiClient } from "./api";
 import { USE_MOCK_DATA } from "../utils/constants";
 import { mockUploadVideo, mockAnalyzeVideo, mockGetVideoStatus } from "../mock/videoMock";
-import type { VideoMetadata, AnalysisResult, VideoStatus } from "../types/video";
+import type { VideoMetadata, VideoStatus } from "../types/video";
 
 export async function uploadVideo(
   file: File,
@@ -14,7 +14,7 @@ export async function uploadVideo(
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await apiClient.post<VideoMetadata>("/videos/upload", formData, {
+  const response = await apiClient.post("/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
     onUploadProgress: (event) => {
       if (onProgress && event.total) {
@@ -23,7 +23,16 @@ export async function uploadVideo(
     },
   });
 
-  return response.data;
+  const data = response.data;
+  return {
+    id: data.video_id,
+    fileName: data.filename,
+    fileSize: file.size,
+    format: file.name.split(".").pop() ?? "mp4",
+    duration: 0,
+    status: "uploaded",
+    uploadedAt: new Date().toISOString(),
+  };
 }
 
 export async function analyzeVideo(videoId: string): Promise<{ status: VideoStatus }> {
@@ -31,8 +40,8 @@ export async function analyzeVideo(videoId: string): Promise<{ status: VideoStat
     return mockAnalyzeVideo(videoId);
   }
 
-  const response = await apiClient.post<{ status: VideoStatus }>(`/videos/${videoId}/analyze`);
-  return response.data;
+  await apiClient.post(`/process/${videoId}`);
+  return { status: "processing" };
 }
 
 export async function getVideoStatus(videoId: string): Promise<VideoStatus> {
@@ -40,11 +49,10 @@ export async function getVideoStatus(videoId: string): Promise<VideoStatus> {
     return mockGetVideoStatus(videoId);
   }
 
-  const response = await apiClient.get<{ status: VideoStatus }>(`/videos/${videoId}/analysis`);
-  return response.data.status;
-}
+  const response = await apiClient.get(`/status/${videoId}`);
+  const backendStatus = response.data.status;
 
-export async function getAnalysisResult(videoId: string): Promise<AnalysisResult> {
-  const response = await apiClient.get<AnalysisResult>(`/videos/${videoId}/analysis`);
-  return response.data;
+  if (backendStatus === "completed") return "completed";
+  if (backendStatus.startsWith("failed")) return "failed";
+  return "processing";
 }
