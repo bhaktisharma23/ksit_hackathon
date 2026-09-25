@@ -12,3 +12,7 @@ outputs/metrics/*
 !data/yolo/images/.gitkeep
 !outputs/processed_videos/.gitkeep
 model/*.pt
+.env
+frontend/**/.env
+frontend/**/node_modules/
+frontend/**/dist/
