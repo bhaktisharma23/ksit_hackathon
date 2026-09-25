@@ -23,12 +23,36 @@ def run_detection_pipeline(video_path: Path, video_id: str) -> dict:
 
     metrics = compute_metrics(inference_results)
 
+    # Normalize bbox from pixels to 0-1 fractions for the frontend overlay
+    width = extraction["source_metadata"]["width"]
+    height = extraction["source_metadata"]["height"]
+
+    detections_list = []
+    det_id = 0
+    for frame_result in inference_results:
+        for det in frame_result["detections"]:
+            bbox = det["bbox"]
+            detections_list.append({
+                "id": str(det_id),
+                "className": det["class_name"],
+                "confidence": det["confidence"],
+                "timestamp": frame_result["timestamp_sec"],
+                "boundingBox": {
+                    "x": bbox["x1"] / width,
+                    "y": bbox["y1"] / height,
+                    "width": (bbox["x2"] - bbox["x1"]) / width,
+                    "height": (bbox["y2"] - bbox["y1"]) / height,
+                },
+            })
+            det_id += 1
+
     results = {
         "video_id": video_id,
         "source_metadata": extraction["source_metadata"],
         "sample_interval": extraction["sample_interval"],
         "total_sampled_frames": extraction["total_sampled"],
         "metrics": metrics,
+        "detections": detections_list,
         "output_video": str(output_video_path.name),
         "status": "completed",
     }

@@ -28,3 +28,15 @@ async def get_result_video(video_id: str):
         raise HTTPException(status_code=404, detail=f"Processed video not found for video_id '{video_id}'")
 
     return FileResponse(path=video_path, media_type="video/mp4", filename=video_path.name)
+
+@router.get("/result/{video_id}/detections")
+async def get_detections(video_id: str):
+    results_path = RESULTS_DIR / f"{video_id}_results.json"
+
+    if not results_path.exists():
+        raise HTTPException(status_code=404, detail=f"No results found for video_id '{video_id}'")
+
+    with open(results_path, "r") as f:
+        results = json.load(f)
+
+    return results.get("detections", [])

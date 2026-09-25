@@ -92,4 +92,4 @@ def run_inference(video_path, model_path="models/best.pt", output_path="output.m
 
 
 if __name__ == "__main__":
-    run_inference('/Users/apple/Downloads/videoplayback (4).mp4')
+    run_inference('video_path.mp4')

@@ -8,7 +8,7 @@ export async function getDetections(videoId: string): Promise<Detection[]> {
     return mockGetDetections(videoId);
   }
 
-  const response = await apiClient.get<Detection[]>(`/videos/${videoId}/detections`);
+  const response = await apiClient.get<Detection[]>(`/result/${videoId}/detections`);
   return response.data;
 }
 
@@ -17,6 +17,11 @@ export async function getDetectionSummary(): Promise<DetectionSummary> {
     return mockGetDetectionSummary();
   }
 
-  const response = await apiClient.get<DetectionSummary>("/detections/summary");
-  return response.data;
+  return {
+    totalDetections: 0,
+    fireCount: 0,
+    smokeCount: 0,
+    averageConfidenceFire: 0,
+    averageConfidenceSmoke: 0,
+  };
 }
