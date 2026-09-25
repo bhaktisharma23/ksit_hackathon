@@ -13,18 +13,26 @@ export function useVideoAnalysis(videoId: string | null) {
     if (!videoId) return;
     setState("loading");
     setError(null);
+
     try {
-      const result = await analyzeVideo(videoId);
-      setStatus(result.status);
+      await analyzeVideo(videoId);
+      setStatus("processing");
 
       pollRef.current = setInterval(async () => {
-        const currentStatus = await getVideoStatus(videoId);
-        setStatus(currentStatus);
-        if (currentStatus === "completed" || currentStatus === "failed") {
-          if (pollRef.current) clearInterval(pollRef.current);
-          setState(currentStatus === "completed" ? "success" : "error");
+        try {
+          const currentStatus = await getVideoStatus(videoId);
+          setStatus(currentStatus);
+
+          if (currentStatus === "completed" || currentStatus === "failed") {
+            if (pollRef.current) clearInterval(pollRef.current);
+            setState(currentStatus === "completed" ? "success" : "error");
+          }
+        } catch (pollErr) {
+    
+          console.warn("Status poll failed, retrying...", pollErr);
         }
       }, 2000);
+
     } catch (err) {
       const message = (err as { message?: string }).message ?? "Analysis failed to start";
       setError(message);
