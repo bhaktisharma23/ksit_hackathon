@@ -1,5 +1,4 @@
 from ultralytics import YOLO
-
 from backend.config import MODEL_PATH, CONFIDENCE_THRESHOLD, IOU_THRESHOLD, CLASS_NAMES
 
 _model = None
@@ -12,18 +11,34 @@ def get_model():
     return _model
 
 
-import random
-
 def run_inference_on_frame(frame_path: str) -> list:
+    model = get_model()
+    results = model.predict(
+        source=frame_path,
+        conf=CONFIDENCE_THRESHOLD,
+        iou=IOU_THRESHOLD,
+        verbose=False,
+    )
+
     detections = []
-    if random.random() > 0.5:
-        cls_id = random.choice([0, 1])
-        detections.append({
-            "class_id": cls_id,
-            "class_name": CLASS_NAMES[cls_id],
-            "confidence": round(random.uniform(0.4, 0.95), 4),
-            "bbox": {"x1": 50, "y1": 50, "x2": 200, "y2": 200},
-        })
+    for result in results:
+        for box in result.boxes:
+            cls_id = int(box.cls[0])
+            conf = float(box.conf[0])
+            xyxy = box.xyxy[0].tolist()
+
+            detections.append({
+                "class_id": cls_id,
+                "class_name": CLASS_NAMES[cls_id] if cls_id < len(CLASS_NAMES) else f"class_{cls_id}",
+                "confidence": round(conf, 4),
+                "bbox": {
+                    "x1": xyxy[0],
+                    "y1": xyxy[1],
+                    "x2": xyxy[2],
+                    "y2": xyxy[3],
+                },
+            })
+
     return detections
 
 
