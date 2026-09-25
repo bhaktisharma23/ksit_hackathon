@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 2
+names: ['fire', 'smoke']
+
+roboflow:
+  workspace: shimsha-bhagavandas
+  project: object-detection-w8yyu
+  version: dataset
+  license: Private
+  url: https://app.roboflow.com/shimsha-bhagavandas/object-detection-w8yyu/dataset
