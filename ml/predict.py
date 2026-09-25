@@ -40,7 +40,7 @@ def run_inference(video_path, model_path="models/best.pt", output_path="output.m
         if not ret:
             break
 
-        results = model.predict(frame, conf=conf, verbose=False)
+        results = model.predict(frame, conf=conf,iou=0.45, verbose=False)
         annotated = frame.copy()
 
         for box in results[0].boxes:
@@ -92,4 +92,4 @@ def run_inference(video_path, model_path="models/best.pt", output_path="output.m
 
 
 if __name__ == "__main__":
-    run_inference('video_path.mp4')
+    run_inference('/Users/apple/Downloads/Video Project 8.mp4')
