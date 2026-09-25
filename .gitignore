@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+data/raw/*
+data/frames/*
+data/yolo/images/*
+data/yolo/labels/*
+outputs/processed_videos/*
+outputs/detection_results/*
+outputs/metrics/*
+!data/raw/.gitkeep
+!data/yolo/images/.gitkeep
+!outputs/processed_videos/.gitkeep
+model/*.pt
