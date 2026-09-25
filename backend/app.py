@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routes import upload
+from backend.routes import upload, detection, results
+
 
 app = FastAPI(title="PS-2 Smoke & Fire Detection API")
 
@@ -14,6 +16,8 @@ app.add_middleware(
 )
 
 app.include_router(upload.router, prefix="/api", tags=["upload"])
+app.include_router(detection.router, prefix="/api", tags=["detection"])
+app.include_router(results.router, prefix="/api", tags=["results"])
 
 
 @app.get("/")
