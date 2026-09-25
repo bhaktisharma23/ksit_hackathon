@@ -1,15 +1,33 @@
-
+# General / Core ignores
 venv/
 __pycache__/
 *.pyc
-
-runs/
-
-dataset/
-
-*.pt
-*.mp4
 .DS_Store
 .vscode/
 .idea/
+.env
+
+# Dataset & ML Model folders
+dataset/
+runs/
+*.pt
+model/*.pt
+
+# Video & Detection Data
+*.mp4
 detections.json
+data/raw/*
+data/frames/*
+data/yolo/images/*
+data/yolo/labels/*
+outputs/processed_videos/*
+outputs/detection_results/*
+outputs/metrics/*
+!data/raw/.gitkeep
+!data/yolo/images/.gitkeep
+!outputs/processed_videos/.gitkeep
+
+# Frontend specific ignores
+frontend/**/.env
+frontend/**/node_modules/
+frontend/**/dist/
