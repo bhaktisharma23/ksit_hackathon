@@ -1,6 +1,11 @@
+import subprocess
+import json
+import os
+
 from ultralytics import YOLO
 import cv2
 import numpy as np
+
 
 def verify_fire_color(frame, box, min_orange_ratio=0.15):
     x1, y1, x2, y2 = map(int, box)
@@ -25,8 +30,10 @@ def run_inference(video_path, model_path="models/best.pt", output_path="output.m
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    out = cv2.VideoWriter(output_path, fourcc, fps, (w, h))
+    raw_path = "output_raw.mp4"
+    out = cv2.VideoWriter(raw_path, fourcc, fps, (w, h))
 
     class_conf_totals = {}
     class_conf_counts = {}
@@ -40,7 +47,7 @@ def run_inference(video_path, model_path="models/best.pt", output_path="output.m
         if not ret:
             break
 
-        results = model.predict(frame, conf=conf,iou=0.45, verbose=False)
+        results = model.predict(frame, conf=conf, iou=0.45, verbose=False)
         annotated = frame.copy()
 
         for box in results[0].boxes:
@@ -76,6 +83,19 @@ def run_inference(video_path, model_path="models/best.pt", output_path="output.m
     cap.release()
     out.release()
 
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-i", raw_path,
+            "-vcodec", "libx264", "-pix_fmt", "yuv420p",
+            output_path
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        print("ffmpeg re-encode failed:", e)
+        raise
+
+    if os.path.exists(raw_path):
+        os.remove(raw_path)
+
     print("Average confidence per class:")
     for cls_name in class_conf_totals:
         avg = class_conf_totals[cls_name] / class_conf_counts[cls_name]
@@ -83,7 +103,6 @@ def run_inference(video_path, model_path="models/best.pt", output_path="output.m
 
     print(f"Output video saved to: {output_path}")
 
-    import json
     with open("detections.json", "w") as f:
         json.dump(detections_log, f, indent=2)
     print("Detection log saved to detections.json")
