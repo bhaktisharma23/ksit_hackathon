@@ -2,6 +2,34 @@ import { apiClient } from "./api";
 import { USE_MOCK_DATA } from "../utils/constants";
 import { mockUploadVideo, mockAnalyzeVideo, mockGetVideoStatus } from "../mock/videoMock";
 import type { VideoMetadata, VideoStatus } from "../types/video";
+import { API_BASE_URL } from "../utils/constants";
+import type { Detection } from "../types/detection";
+
+export interface SavedAnalysis {
+  video_id: string;
+  status: string;
+  filename?: string;
+  analyzed_at?: string;
+  source_metadata?: {
+    duration_sec?: number;
+  };
+  detections: Detection[];
+}
+
+export async function getSavedAnalysis(
+  videoId: string
+): Promise<SavedAnalysis> {
+  const response = await apiClient.get<SavedAnalysis>(`/result/${videoId}`);
+  return response.data;
+}
+
+export function getProcessedVideoUrl(videoId: string): string {
+  return `${API_BASE_URL}/result/${encodeURIComponent(videoId)}/video`;
+}
+
+export function getSourceVideoUrl(videoId: string): string {
+  return `${API_BASE_URL}/result/${encodeURIComponent(videoId)}/source`;
+}
 
 export async function uploadVideo(
   file: File,

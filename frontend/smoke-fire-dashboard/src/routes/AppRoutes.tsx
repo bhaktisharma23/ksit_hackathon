@@ -4,8 +4,7 @@ import VideoAnalysis from "../pages/VideoAnalysis";
 import RealTimeMonitoring from "../pages/RealTimeMonitoring";
 import AlertLogs from "../pages/AlertLogs";
 import History from "../pages/History";
-import AIModels from "../pages/AIModels";
-import Settings from "../pages/Settings";
+import About from "../pages/About";
 
 export default function AppRoutes() {
   return (
@@ -16,8 +15,7 @@ export default function AppRoutes() {
       <Route path="/monitoring" element={<RealTimeMonitoring />} />
       <Route path="/alerts" element={<AlertLogs />} />
       <Route path="/history" element={<History />} />
-      <Route path="/models" element={<AIModels />} />
-      <Route path="/settings" element={<Settings />} />
+      <Route path="/about" element={<About />} />
     </Routes>
   );
 }

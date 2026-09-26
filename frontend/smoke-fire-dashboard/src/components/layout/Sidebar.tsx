@@ -17,8 +17,6 @@ const navItems = [
   { to: "/monitoring", label: "Real-time Monitoring", icon: Radio },
   { to: "/alerts", label: "Alert Logs", icon: Bell },
   { to: "/history", label: "History", icon: History },
-  { to: "/models", label: "AI Models", icon: Cpu },
-  { to: "/settings", label: "System Settings", icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -47,10 +45,13 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 pb-6">
-        <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium w-full hover:bg-gray-800 hover:text-white transition-colors">
+        <NavLink
+          to="/about"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium w-full hover:bg-gray-800 hover:text-white transition-colors"
+        >
           <HelpCircle size={18} />
-          Help Center
-        </button>
+          About
+        </NavLink>
       </div>
     </aside>
   );

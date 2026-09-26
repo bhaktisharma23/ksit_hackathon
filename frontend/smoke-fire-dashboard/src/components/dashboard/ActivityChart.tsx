@@ -8,25 +8,29 @@ export default function ActivityChart({ data }: ActivityChartProps) {
   const maxValue = Math.max(...data.flatMap((d) => [d.fire, d.smoke]), 1);
 
   return (
-    <Card>
-      <h3 className="text-sm font-semibold text-gray-700 mb-4">Detection Activity</h3>
-      <div className="flex items-end gap-4 h-40">
-        {data.map((point) => (
-          <div key={point.label} className="flex-1 flex flex-col items-center gap-1">
-            <div className="flex items-end gap-1 h-32 w-full justify-center">
-              <div
-                className="w-3 bg-fire rounded-t"
-                style={{ height: `${(point.fire / maxValue) * 100}%` }}
-              />
-              <div
-                className="w-3 bg-smoke rounded-t"
-                style={{ height: `${(point.smoke / maxValue) * 100}%` }}
-              />
-            </div>
-            <span className="text-xs text-gray-400">{point.label}</span>
-          </div>
-        ))}
+    <div className="h-40 overflow-x-auto">
+  <div className="flex h-full min-w-[900px] items-end gap-2">
+    {data.map((point) => (
+      <div
+        key={point.label}
+        className="flex h-full min-w-7 flex-1 flex-col items-center justify-end gap-1"
+      >
+        <div className="flex h-32 w-full items-end justify-center gap-1">
+          <div
+            className="w-3 rounded-t bg-fire"
+            style={{ height: `${(point.fire / maxValue) * 100}%` }}
+            title={`Fire: ${point.fire}`}
+          />
+          <div
+            className="w-3 rounded-t bg-smoke"
+            style={{ height: `${(point.smoke / maxValue) * 100}%` }}
+            title={`Smoke: ${point.smoke}`}
+          />
+        </div>
+        <span className="text-xs text-gray-400">{point.label}</span>
       </div>
-    </Card>
+    ))}
+  </div>
+</div>
   );
 }

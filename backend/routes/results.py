@@ -3,7 +3,8 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
 from backend.config import RESULTS_DIR, OUTPUT_VIDEO_DIR
-
+import mimetypes
+from backend.utils.file_utils import get_upload_path
 router = APIRouter()
 
 
@@ -40,3 +41,16 @@ async def get_detections(video_id: str):
         results = json.load(f)
 
     return results.get("detections", [])
+
+@router.get("/result/{video_id}/source")
+async def get_source_video(video_id: str):
+    source_path = get_upload_path(video_id)
+    media_type = mimetypes.guess_type(source_path.name)[0] or "video/mp4"
+
+    return FileResponse(
+        path=source_path,
+        media_type=media_type,
+        headers={
+            "Content-Disposition": f'inline; filename="{source_path.name}"'
+        },
+    )
