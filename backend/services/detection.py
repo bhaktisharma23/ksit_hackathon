@@ -10,6 +10,18 @@ from backend.services.postprocessing import build_output_video
 from backend.services.metrics import compute_metrics
 
 
+def _dedupe_detections(frame_detections: list) -> list:
+    best_by_class = {}
+
+    for det in frame_detections:
+        class_name = det["class_name"]
+        current_best = best_by_class.get(class_name)
+        if current_best is None or det["confidence"] > current_best["confidence"]:
+            best_by_class[class_name] = det
+
+    return list(best_by_class.values())
+
+
 def run_detection_pipeline(video_path: Path, video_id: str) -> dict:
     extraction = extract_frames(video_path, video_id)
 
@@ -17,11 +29,15 @@ def run_detection_pipeline(video_path: Path, video_id: str) -> dict:
         extraction["frame_records"]
     )
 
+    for frame_result in inference_results:
+        frame_result["detections"] = _dedupe_detections(frame_result["detections"])
+
     output_video_path = build_output_video(
         video_id=video_id,
         frame_records=extraction["frame_records"],
         inference_results=inference_results,
         source_metadata=extraction["source_metadata"],
+        sample_interval=extraction["sample_interval"],
     )
 
     metrics = compute_metrics(inference_results)

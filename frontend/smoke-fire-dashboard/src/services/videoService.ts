@@ -84,3 +84,10 @@ export async function getVideoStatus(videoId: string): Promise<VideoStatus> {
   if (backendStatus.startsWith("failed")) return "failed";
   return "processing";
 }
+
+export async function getResultVideoUrl(videoId: string): Promise<string> {
+  const response = await apiClient.get(`/result/${videoId}/video`, {
+    responseType: "blob",
+  });
+  return URL.createObjectURL(response.data);
+}

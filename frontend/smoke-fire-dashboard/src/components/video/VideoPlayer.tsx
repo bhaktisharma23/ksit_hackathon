@@ -8,9 +8,10 @@ interface VideoPlayerProps {
   videoUrl?: string;
   detections: Detection[];
   seekTo?: number;
+  showOverlay?: boolean;
 }
 
-export default function VideoPlayer({ videoUrl, detections, seekTo }: VideoPlayerProps) {
+export default function VideoPlayer({ videoUrl, detections, seekTo, showOverlay = true }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -67,7 +68,7 @@ export default function VideoPlayer({ videoUrl, detections, seekTo }: VideoPlaye
         </div>
       )}
 
-      <DetectionOverlay detections={detections} currentTime={currentTime} />
+      {showOverlay && <DetectionOverlay detections={detections} currentTime={currentTime} />}
 
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 space-y-2">
         <input

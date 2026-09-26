@@ -1,4 +1,5 @@
 import cv2
+import subprocess
 from pathlib import Path
 
 from backend.config import OUTPUT_VIDEO_DIR, OUTPUT_CODEC
@@ -26,14 +27,21 @@ def draw_detections_on_frame(frame_path: str, detections: list):
     return frame
 
 
-def build_output_video(video_id: str, frame_records: list, inference_results: list, source_metadata: dict) -> Path:
+def build_output_video(
+    video_id: str,
+    frame_records: list,
+    inference_results: list,
+    source_metadata: dict,
+    sample_interval: int,
+) -> Path:
     output_path = OUTPUT_VIDEO_DIR / f"{video_id}_processed.mp4"
+    raw_path = OUTPUT_VIDEO_DIR / f"{video_id}_processed_raw.mp4"
     fourcc = cv2.VideoWriter_fourcc(*OUTPUT_CODEC)
 
     width, height = source_metadata["width"], source_metadata["height"]
-    fps = len(frame_records) / source_metadata["duration_sec"]
+    fps = source_metadata["fps"]
 
-    writer = cv2.VideoWriter(str(output_path), fourcc, fps, (width, height))
+    writer = cv2.VideoWriter(str(raw_path), fourcc, fps, (width, height))
 
     detections_by_frame = {r["frame_index"]: r["detections"] for r in inference_results}
 
@@ -41,7 +49,22 @@ def build_output_video(video_id: str, frame_records: list, inference_results: li
         idx = record["frame_index"]
         detections = detections_by_frame.get(idx, [])
         frame = draw_detections_on_frame(record["path"], detections)
-        writer.write(frame)
+        for _ in range(max(1, sample_interval)):
+            writer.write(frame)
 
     writer.release()
+
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(raw_path),
+            "-vcodec", "libx264", "-pix_fmt", "yuv420p",
+            str(output_path)
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"ffmpeg re-encode failed for {video_id}:", e)
+        raise
+    finally:
+        if raw_path.exists():
+            raw_path.unlink()
+
     return output_path
